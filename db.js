@@ -1,16 +1,14 @@
 var mysql = require('mysql');
+// 
+var cfg = require('./config/index')
 
 var db = mysql.createConnection({
-  host: '127.0.0.1', // database host
-  port: 3306, // database port at 3306
-  user: 'root', // database user
-  password: 'toor', // database password
-  database: 'company' // database name
+  host: cfg.DB_HOST, 
+  port: 3306, 
+  user: cfg.DB_USER, 
+  password: cfg.DB_PASS, 
+  database: cfg.DB_NAME 
 });
-
-// TODO: implement logic
-
-// FIXME: implement logic
 
 db.connect(function(err) {
   if (err) {

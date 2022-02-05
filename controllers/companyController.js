@@ -1,18 +1,29 @@
 const db = require("../db");
 const Company = require("../model/company");
+const {saveImage} = require('./uploadImageController')
 
-exports.Create = (req, res) => {
+exports.Create = async (req, res) => {
   try {
-    let { name, address } = req.body;
-    let company = new Company(name, address);
+    
+    photo = await saveImage(req.body.photo)
 
-    let query = `INSERT INTO company(name, address) VALUES (?, ?)`;
+    let company = new Company(req.body.name, req.body.address, photo);
 
-    db.query(query, [company.name, company.address], (err, result) => {
+    let query = `INSERT INTO company (name, address, photo) VALUES (?, ?, ?)`;
+
+    db.query(query, [company.name, company.address, company.photo], (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Create Company not success.",
+        });
+      }
+     
       return res.status(200).json({
         message: "Create Company Successful",
       });
+
     });
+
   } catch (error) {
     return res.status(500).json({
       status: "INTERNAL_SERVER_ERROR",
@@ -30,6 +41,7 @@ exports.GetAll = (req, res) => {
         result: result,
       });
     });
+
   } catch (error) {
     return res.status(500).json({
       status: "INTERNAL_SERVER_ERROR",
@@ -48,6 +60,7 @@ exports.Update = async (req, res) => {
         message: "Company updated successfully",
       });
     });
+
   } catch (error) {
     return res.status(500).json({
       status: "INTERNAL_SERVER_ERROR",
@@ -55,3 +68,22 @@ exports.Update = async (req, res) => {
     });
   }
 };
+
+// req: request && res : response
+exports.Delete = (req, res) => {
+  try {
+    const q = `DELETE FROM company WHERE id = ${req.params.id}`
+    db.query(q, (err, result)=>{
+      return res.status(200).json({
+        message: "Company deleted successfully."
+      })
+    })
+  } catch (err) {
+
+    return res.status(500).json({
+      status:"INTERNAL ERROR",
+      message: err.message
+    })
+    
+  }
+}
